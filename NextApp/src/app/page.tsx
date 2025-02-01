@@ -1,16 +1,25 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import OllamaChat from "./chat"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./utils/firebaseConfig";
+import Login from "./login";
 
-const Home: React.FC = () => {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-      <h1 className="text-3xl font-bold mb-4">Welcome to Ollama Chat</h1>
-      <OllamaChat />
-    </div>
-  );
-};
 
-export default Home;
+export default function Home() {
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        router.push("/chat");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  return <Login />;
+}
